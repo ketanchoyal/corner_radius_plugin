@@ -1,0 +1,30 @@
+name: corner_radius_plugin
+description: Flutter plugin to get device screen corner radius on Android and iOS
+version: 0.0.1
+homepage: https://github.com/yourusername/corner-radius-plugin
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.ketanchoyal.corner_radius_plugin
+        pluginClass: CornerRadiusPlugin
+      ios:
+        pluginClass: CornerRadiusPlugin
+
+  assets:
+    - assets/bezel.min.json
