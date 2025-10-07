@@ -2,7 +2,7 @@ name: Publish to Pub.dev
 
 on:
   push:
-    branches: [beta, master]
+    branches: [beta, main]
 
 jobs:
   publishing:
