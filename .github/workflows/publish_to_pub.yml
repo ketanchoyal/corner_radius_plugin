@@ -3,9 +3,16 @@ name: Publish to Pub.dev
 on:
   push:
     branches: [beta, main]
+  workflow_run:
+    workflows: ["Update Bezel JSON"]
+    types:
+      - completed
 
 jobs:
   publishing:
+    # Run on push events normally. When triggered via workflow_run (Update Bezel JSON)
+    # only continue when the upstream workflow completed successfully.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
