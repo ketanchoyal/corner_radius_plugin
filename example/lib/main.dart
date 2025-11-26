@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:corner_radius_plugin/corner_radius_plugin.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

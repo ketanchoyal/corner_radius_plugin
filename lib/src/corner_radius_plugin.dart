@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 part 'corner_radius_plugin_platform_interface.dart';
@@ -75,6 +76,8 @@ class CornerRadiusPlugin {
   ///
   /// Returns a [Future<CornerRadius>] representing the initialized plugin instance.
   static Future<CornerRadius> init() async {
+    // Ensure bindings are initialized before any asset/binary messenger usage.
+    WidgetsFlutterBinding.ensureInitialized();
     if (Platform.isIOS) {
       final info = await CornerRadiusPluginPlatform._instance.getDeviceInfo();
       if (info == null ||
@@ -85,10 +88,19 @@ class CornerRadiusPlugin {
       }
       final modelId = info["modelIdentifier"]!;
       final deviceType = info["deviceType"]!;
-
+      String jsonStr;
+      try {
+        jsonStr = await rootBundle.loadString(
+          'packages/corner_radius_plugin/assets/bezel.min.json',
+        );
+      } catch (_) {
+        _screenRadius = CornerRadius._default();
+        return _screenRadius;
+      }
       final radius = await compute(_lookupBezelForModel, {
         'modelId': modelId,
         'deviceType': deviceType,
+        'json': jsonStr,
       });
       if (radius == null || radius == 0) {
         _screenRadius = CornerRadius._default();
@@ -113,35 +125,63 @@ class CornerRadiusPlugin {
 Future<double?> _lookupBezelForModel(Map<String, dynamic> params) async {
   final modelId = params['modelId'] as String;
   final deviceType = params['deviceType'] as String;
+  // final RootIsolateToken? token = params['token'] as RootIsolateToken?;
+  final String providedJson = params['json'] as String;
 
   try {
-    final bundle = rootBundle;
-    final jsonStr = await bundle.loadString(
-      'packages/corner_radius_plugin/assets/bezel.min.json',
-    );
-    final dynamic decoded = json.decode(jsonStr);
-    if (decoded is Map<String, dynamic>) {
-      // Try type-scoped lookup first
-      final typeMap = decoded[deviceType];
-      if (typeMap is Map<String, dynamic>) {
-        final device = typeMap[modelId];
-        if (device is Map<String, dynamic>) {
-          final val = device['bezel'];
-          if (val is num) return val.toDouble();
-        }
-      }
+    // Prefer JSON provided from the main isolate to avoid asset loading here.
+    final dynamic decoded = json.decode(providedJson);
+    if (decoded is! Map<String, dynamic>) return 0;
 
-      // Fallback to flat devices map
-      final devices = decoded['devices'];
-      if (devices is Map<String, dynamic>) {
-        final device = devices[modelId];
-        if (device is Map<String, dynamic>) {
-          final val = device['bezel'];
-          if (val is num) return val.toDouble();
-        }
+    // Dataset shape:
+    // { "_metadata": {...}, "devices": { "iPhone": { "iPhone14,2": { "bezel": 47.33 } }, "iPad": {...} } }
+    final devicesRoot = decoded['devices'];
+    if (devicesRoot is! Map<String, dynamic>) return 0;
+
+    double? parseBezel(dynamic deviceEntry) {
+      if (deviceEntry is! Map<String, dynamic>) return null;
+      final dynamic v =
+          deviceEntry['bezel'] ??
+          deviceEntry['bazel'] ??
+          deviceEntry['radius'] ??
+          deviceEntry['cornerRadius'];
+      if (v is num) return v.toDouble();
+      if (v is String) {
+        final d = double.tryParse(v);
+        if (d != null) return d;
+      }
+      return null;
+    }
+
+    // 1) Try direct type -> model lookup
+    final typeMap = devicesRoot[deviceType];
+    if (typeMap is Map<String, dynamic>) {
+      final device = typeMap[modelId];
+      final parsed = parseBezel(device);
+      if (parsed != null) return parsed;
+    }
+
+    // 2) Try well-known iOS families if deviceType didn't match nesting
+    const fallbackFamilies = ['iPhone', 'iPad', 'iPod'];
+    for (final fam in fallbackFamilies) {
+      final famMap = devicesRoot[fam];
+      if (famMap is Map<String, dynamic>) {
+        final device = famMap[modelId];
+        final parsed = parseBezel(device);
+        if (parsed != null) return parsed;
       }
     }
-  } catch (_) {
+
+    // 3) Last resort: search all types for the modelId
+    for (final entry in devicesRoot.values) {
+      if (entry is Map<String, dynamic>) {
+        final device = entry[modelId];
+        final parsed = parseBezel(device);
+        if (parsed != null) return parsed;
+      }
+    }
+  } catch (e, st) {
+    debugPrint('Error loading bezel data: $e\n$st');
     return 0;
   }
   return 0;
