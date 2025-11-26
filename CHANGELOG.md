@@ -1,3 +1,7 @@
+## 0.0.4 - 2025-11-26
+
+Fixed isolate not working as expected
+
 ## 0.0.3 - 2025-10-07
 
 Device dataset Updated
