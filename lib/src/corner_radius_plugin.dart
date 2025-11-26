@@ -75,7 +75,8 @@ class CornerRadiusPlugin {
   /// with a [CornerRadius] instance when the initialization is done.
   ///
   /// Returns a [Future<CornerRadius>] representing the initialized plugin instance.
-  static Future<CornerRadius> init() async {
+  static Future<CornerRadius> init({double defaultRadius = 0}) async {
+    CornerRadius._defaultRadius = defaultRadius;
     // Ensure bindings are initialized before any asset/binary messenger usage.
     WidgetsFlutterBinding.ensureInitialized();
     if (Platform.isIOS) {
