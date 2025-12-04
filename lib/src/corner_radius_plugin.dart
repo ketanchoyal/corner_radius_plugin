@@ -109,13 +109,22 @@ class CornerRadiusPlugin {
       }
       _screenRadius = CornerRadius._all(radius);
       return _screenRadius;
-    } else {
+    } else if (Platform.isAndroid) {
       final map = await CornerRadiusPluginPlatform._instance.getScreenRadius();
       if (map == null) {
         _screenRadius = CornerRadius._default();
         return _screenRadius;
       }
       _screenRadius = CornerRadius._fromMap(map);
+      return _screenRadius;
+    } else {
+      // Unsupported platforms: macOS, Windows, Linux, web, etc.
+      // Return the default radius since we have no platform-specific APIs.
+      debugPrint(
+        'Platform ${Platform.operatingSystem} is not yet supported. '
+        'Using default radius. Call setDefaultRadius() or pass defaultRadius to init() to customize.',
+      );
+      _screenRadius = CornerRadius._default();
       return _screenRadius;
     }
   }

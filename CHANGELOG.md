@@ -1,3 +1,7 @@
+## 0.0.6 - 2025-12-04
+
+- feat: Add support for all platforms (macOS, Windows, Linux, web) with default radius fallback
+
 ## 0.0.5 - 2025-11-26
 - feat: Allow setting default radius during plugin initialization
 
