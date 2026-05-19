@@ -1,3 +1,7 @@
+## 0.0.7 - 2026-05-19
+
+Device dataset Updated
+
 ## 0.0.6 - 2025-12-04
 
 - feat: Add support for all platforms (macOS, Windows, Linux, web) with default radius fallback
