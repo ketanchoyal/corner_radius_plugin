@@ -4,13 +4,15 @@ Demonstrates how to use the corner_radius_plugin plugin.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This example initializes the plugin once at startup and then reads the value
+from `CornerRadiusPlugin.screenRadius`.
 
-A few resources to get you started if this is your first Flutter project:
+Key points:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Call `await CornerRadiusPlugin.init(defaultRadius: 12)` once (for example in
+	`initState`).
+- Use `CornerRadiusPlugin.screenRadius` for the current corner values.
+- Provide a non-zero `defaultRadius` as a fallback for unsupported platforms or
+	unknown devices.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Run the example from the package root with Flutter as usual.

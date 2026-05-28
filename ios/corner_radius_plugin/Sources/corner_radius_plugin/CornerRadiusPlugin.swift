@@ -20,8 +20,6 @@ public class CornerRadiusPlugin: NSObject, FlutterPlugin {
     }
   }
 
-  // JSON parsing moved to Dart side
-
   private static func deviceTypeString() -> String {
     switch UIDevice.current.userInterfaceIdiom {
     case .phone: return "iPhone"

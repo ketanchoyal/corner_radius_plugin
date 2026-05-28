@@ -4,17 +4,17 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'corner_radius_plugin'
-  s.version          = '0.0.1'
+  s.version          = '0.0.8'
   s.summary          = 'Flutter plugin to get device screen corner radius'
   s.description      = <<-DESC
 Flutter plugin to get device screen corner radius on Android and iOS.
 Android uses native RoundedCorner API, iOS uses BezelKit JSON data.
                        DESC
-  s.homepage         = 'https://github.com/yourusername/corner-radius-plugin'
+  s.homepage         = 'https://github.com/ketanchoyal/corner_radius_plugin'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Name' => 'your.email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'corner_radius_plugin/Sources/corner_radius_plugin/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
 

@@ -1,3 +1,7 @@
+## 0.0.8 - 2026-05-23
+
+- feat: Add iOS Swift Package Manager support alongside CocoaPods
+
 ## 0.0.7 - 2026-05-19
 
 Device dataset Updated

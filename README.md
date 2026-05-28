@@ -17,6 +17,13 @@ dependencies:
   corner_radius_plugin: any
 ```
 
+### iOS package managers
+
+The iOS implementation now supports both CocoaPods and Swift Package Manager.
+
+- **CocoaPods** continues to work for existing Flutter iOS projects.
+- **Swift Package Manager** works with Flutter's SwiftPM integration on supported Flutter/Xcode versions; no extra plugin-side setup is required beyond enabling SwiftPM for the host app.
+
 ## Usage
 
 Initialize during app startup, e.g. in `main()` or `initState()`.

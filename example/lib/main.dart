@@ -14,18 +14,24 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late final Future<CornerRadius> _radiusFuture;
+
   @override
   void initState() {
     super.initState();
+    // Initialize once with a non-zero fallback radius for unsupported devices.
+    _radiusFuture = CornerRadiusPlugin.init(defaultRadius: 12);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(title: const Text('Corner Radius Plugin Example')),
         body: SafeArea(
           child: FutureBuilder(
-            future: CornerRadiusPlugin.init(),
+            future: _radiusFuture,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
@@ -36,62 +42,93 @@ class _MyAppState extends State<MyApp> {
                 return const Center(child: Text('No data'));
               }
 
+              // Demonstrate the static getter after init.
+              final screenRadius = CornerRadiusPlugin.screenRadius;
+
               return Padding(
                 padding: const EdgeInsets.all(16),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(data.topLeft),
-                      topRight: Radius.circular(data.topRight),
-                      bottomLeft: Radius.circular(data.bottomLeft),
-                      bottomRight: Radius.circular(data.bottomRight),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(screenRadius.topLeft),
+                            topRight: Radius.circular(screenRadius.topRight),
+                            bottomLeft: Radius.circular(
+                              screenRadius.bottomLeft,
+                            ),
+                            bottomRight: Radius.circular(
+                              screenRadius.bottomRight,
+                            ),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Stack(
+                            children: [
+                              _CornerValue(
+                                alignment: Alignment.topLeft,
+                                value: screenRadius.topLeft,
+                              ),
+                              _CornerValue(
+                                alignment: Alignment.topRight,
+                                value: screenRadius.topRight,
+                              ),
+                              _CornerValue(
+                                alignment: Alignment.bottomLeft,
+                                value: screenRadius.bottomLeft,
+                              ),
+                              _CornerValue(
+                                alignment: Alignment.bottomRight,
+                                value: screenRadius.bottomRight,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            data.topLeft.toStringAsFixed(2).toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 32),
-                          ),
+                    const SizedBox(height: 16),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Text(
+                          'Initialized with defaultRadius: 12\n'
+                          'Current values (TL, TR, BL, BR): '
+                          '${screenRadius.topLeft.toStringAsFixed(2)}, '
+                          '${screenRadius.topRight.toStringAsFixed(2)}, '
+                          '${screenRadius.bottomLeft.toStringAsFixed(2)}, '
+                          '${screenRadius.bottomRight.toStringAsFixed(2)}',
                         ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Text(
-                            data.topRight.toStringAsFixed(2).toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 32),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Text(
-                            data.bottomLeft.toStringAsFixed(2).toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 32),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Text(
-                            data.bottomRight.toStringAsFixed(2).toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 32),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               );
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CornerValue extends StatelessWidget {
+  const _CornerValue({required this.alignment, required this.value});
+
+  final Alignment alignment;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: Text(
+        value.toStringAsFixed(2),
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white, fontSize: 28),
       ),
     );
   }

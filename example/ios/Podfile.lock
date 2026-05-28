@@ -1,5 +1,5 @@
 PODS:
-  - corner_radius_plugin (0.0.1):
+  - corner_radius_plugin (0.0.8):
     - Flutter
   - Flutter (1.0.0)
   - integration_test (0.0.1):
@@ -19,7 +19,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/integration_test/ios"
 
 SPEC CHECKSUMS:
-  corner_radius_plugin: ff13d7cf5bf4a014c88393c0d304b9dd1f45b85c
+  corner_radius_plugin: 81c1da586a9b45e894ca04f4226574e73121eb9a
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
 
