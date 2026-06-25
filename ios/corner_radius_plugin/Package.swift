@@ -9,7 +9,7 @@ let package = Package(
         .iOS("13.0")
     ],
     products: [
-        .library(name: "corner_radius_plugin", targets: ["corner_radius_plugin"])
+        .library(name: "corner-radius-plugin", targets: ["corner_radius_plugin"])
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework")

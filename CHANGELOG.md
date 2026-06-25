@@ -1,3 +1,7 @@
+## 0.0.9 - 2026-06-25
+
+- fix: Fixed library name in Package.swift for SPM support as per Flutter requirements.
+
 ## 0.0.8 - 2026-05-23
 
 - feat: Add iOS Swift Package Manager support alongside CocoaPods
