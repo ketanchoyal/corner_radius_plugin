@@ -1,3 +1,9 @@
+## 0.1.0 - 2026-09-03
+
+- Migrates to Built-in Kotlin (removes Kotlin Gradle Plugin application) to resolve build warnings and ensure compatibility with AGP 9+.
+- Updates minimum supported SDK version to Flutter 3.44.0 and Dart 3.12.0.
+- Updates platform detection to use Flutter's `defaultTargetPlatform` for improved compatibility and testability.
+
 ## 0.0.9 - 2026-06-25
 
 - fix: Fixed library name in Package.swift for SPM support as per Flutter requirements.

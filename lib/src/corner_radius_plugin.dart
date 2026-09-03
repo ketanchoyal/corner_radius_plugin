@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -79,7 +78,7 @@ class CornerRadiusPlugin {
     CornerRadius._defaultRadius = defaultRadius;
     // Ensure bindings are initialized before any asset/binary messenger usage.
     WidgetsFlutterBinding.ensureInitialized();
-    if (Platform.isIOS) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
       final info = await CornerRadiusPluginPlatform._instance.getDeviceInfo();
       if (info == null ||
           info["modelIdentifier"] == null ||
@@ -109,7 +108,7 @@ class CornerRadiusPlugin {
       }
       _screenRadius = CornerRadius._all(radius);
       return _screenRadius;
-    } else if (Platform.isAndroid) {
+    } else if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       final map = await CornerRadiusPluginPlatform._instance.getScreenRadius();
       if (map == null) {
         _screenRadius = CornerRadius._default();
@@ -121,7 +120,7 @@ class CornerRadiusPlugin {
       // Unsupported platforms: macOS, Windows, Linux, web, etc.
       // Return the default radius since we have no platform-specific APIs.
       debugPrint(
-        'Platform ${Platform.operatingSystem} is not yet supported. '
+        'Platform ${kIsWeb ? 'web' : defaultTargetPlatform.name} is not yet supported. '
         'Using default radius. Call setDefaultRadius() or pass defaultRadius to init() to customize.',
       );
       _screenRadius = CornerRadius._default();
