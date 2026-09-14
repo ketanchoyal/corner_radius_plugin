@@ -1,3 +1,7 @@
+## 0.1.1 - 2026-09-14
+
+Device dataset Updated
+
 ## 0.1.0 - 2026-09-03
 
 - Migrates to Built-in Kotlin (removes Kotlin Gradle Plugin application) to resolve build warnings and ensure compatibility with AGP 9+.
