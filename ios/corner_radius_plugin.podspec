@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'corner_radius_plugin'
-  s.version          = '0.0.8'
+  s.version          = '1.0.0'
   s.summary          = 'Flutter plugin to get device screen corner radius'
   s.description      = <<-DESC
 Flutter plugin to get device screen corner radius on Android and iOS.

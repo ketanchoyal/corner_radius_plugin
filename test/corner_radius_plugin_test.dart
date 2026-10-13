@@ -15,6 +15,10 @@ class MockCornerRadiusPluginPlatform
   });
 
   @override
+  Stream<Map<String, double>?> getScreenRadiusStream() =>
+      const Stream.empty();
+
+  @override
   Future<Map<String, String>?> getDeviceInfo() async => {
     'modelIdentifier': 'iPhone14,2',
     'deviceType': 'iPhone',

@@ -1,3 +1,9 @@
+## 1.0.0 - 2026-10-13
+
+- Support iOS 26+ devices via `UICornerConfiguration`, reading the real per-corner display radius for the active screen.
+- Add `CornerRadiusPlugin.screenRadiusStream` (with native event channel and polling) for live corner radius updates on multi-screen devices such as iPhone Duo.
+- Update example app to consume the live stream.
+
 ## 0.1.1 - 2026-09-14
 
 Device dataset Updated

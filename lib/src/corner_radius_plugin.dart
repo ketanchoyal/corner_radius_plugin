@@ -68,6 +68,25 @@ class CornerRadiusPlugin {
   /// This value is updated after calling the [init] method.
   static CornerRadius get screenRadius => _screenRadius;
 
+  /// A broadcast-friendly stream of the current screen's [CornerRadius].
+  ///
+  /// The stream emits whenever the native platform reports a new corner
+  /// radius for the active screen (for example after a display/orientation
+  /// change on multi-screen devices such as iPhone Duo). The cached
+  /// [screenRadius] value is updated as new events arrive.
+  static Stream<CornerRadius> get screenRadiusStream {
+    return CornerRadiusPluginPlatform._instance
+        .getScreenRadiusStream()
+        .map((map) {
+          if (map == null) {
+            return _screenRadius;
+          }
+          final radius = CornerRadius._fromMap(map);
+          _screenRadius = radius;
+          return radius;
+        });
+  }
+
   /// Initializes the CornerRadius plugin.
   ///
   /// This static method initializes the plugin and returns a [Future] that completes
@@ -79,6 +98,23 @@ class CornerRadiusPlugin {
     // Ensure bindings are initialized before any asset/binary messenger usage.
     WidgetsFlutterBinding.ensureInitialized();
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+      // iOS 26+ exposes the real per-corner display radius through UIKit's
+      // corner configuration. Prefer it whenever the platform provides it,
+      // falling back to the BezelKit dataset for older OS versions.
+      final nativeMap = await CornerRadiusPluginPlatform._instance.getScreenRadius();
+      if (nativeMap != null &&
+          nativeMap['topLeft'] != null &&
+          nativeMap['topRight'] != null &&
+          nativeMap['bottomLeft'] != null &&
+          nativeMap['bottomRight'] != null &&
+          (nativeMap['topLeft']! > 0 ||
+              nativeMap['topRight']! > 0 ||
+              nativeMap['bottomLeft']! > 0 ||
+              nativeMap['bottomRight']! > 0)) {
+        _screenRadius = CornerRadius._fromMap(nativeMap);
+        return _screenRadius;
+      }
+
       final info = await CornerRadiusPluginPlatform._instance.getDeviceInfo();
       if (info == null ||
           info["modelIdentifier"] == null ||

@@ -6,6 +6,10 @@ class _MethodChannelCornerRadiusPlugin extends CornerRadiusPluginPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('corner_radius_plugin');
 
+  /// Event channel used for live corner radius updates.
+  @visibleForTesting
+  final eventChannel = const EventChannel('corner_radius_plugin/radius');
+
   @override
   Future<Map<String, double>?> getScreenRadius() async {
     final Map<Object?, Object?>? res = await methodChannel.invokeMethod(
@@ -15,6 +19,17 @@ class _MethodChannelCornerRadiusPlugin extends CornerRadiusPluginPlatform {
     return res.map(
       (key, value) => MapEntry(key.toString(), (value as num).toDouble()),
     );
+  }
+
+  @override
+  Stream<Map<String, double>?> getScreenRadiusStream() {
+    return eventChannel.receiveBroadcastStream().map((event) {
+      if (event == null) return null;
+      final raw = Map<String, dynamic>.from(event as Map);
+      return raw.map(
+        (key, value) => MapEntry(key.toString(), (value as num).toDouble()),
+      );
+    });
   }
 
   @override

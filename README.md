@@ -3,7 +3,26 @@
 Flutter plugin to get the current device screen corner radius on Android and iOS.
 
 - **Android**: uses Android 12+ `RoundedCorner` via `WindowInsets`, with fallback to the system dimen `rounded_corner_radius` when available.
-- **iOS**: integrates a BezelKit hook for accurate device bezels
+- **iOS 26+**: uses UIKit `UICornerConfiguration` (container-concentric corners) to read the
+  real per-corner display radius for the active screen, including separate corners in every
+  orientation and on each screen of iPhone Duo.
+- **iOS < 26**: integrates a BezelKit hook for accurate device bezels
+- Listen to the active screen with `CornerRadiusPlugin.screenRadiusStream` (useful on
+  multi-screen devices such as iPhone Duo).
+
+```dart
+final subscription = CornerRadiusPlugin.screenRadiusStream.listen((radius) {
+  debugPrint(
+    'Active screen corners: '
+    '${radius.topLeft}, ${radius.topRight}, '
+    '${radius.bottomLeft}, ${radius.bottomRight}',
+  );
+  // Rebuild your UI or update border radii here.
+});
+
+// Cancel when no longer needed.
+await subscription.cancel();
+```
 
 Inspired by and Android logic adapted from `screen_corner_radius` [GitHub repo](https://github.com/ivangalkindeveloper/screen_corner_radius).
 For iOS bezel data, see `BezelKit` [GitHub repo](https://github.com/markbattistella/BezelKit) and documentation at `swiftpackageindex.com/markbattistella/BezelKit/documentation`.

@@ -14,13 +14,32 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final Future<CornerRadius> _radiusFuture;
+  CornerRadius _screenRadius = const CornerRadius(
+    topLeft: 12,
+    topRight: 12,
+    bottomLeft: 12,
+    bottomRight: 12,
+  );
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
     // Initialize once with a non-zero fallback radius for unsupported devices.
-    _radiusFuture = CornerRadiusPlugin.init(defaultRadius: 12);
+    CornerRadiusPlugin.init(defaultRadius: 12).then((radius) {
+      if (!mounted) return;
+      setState(() {
+        _screenRadius = radius;
+        _initialized = true;
+      });
+    });
+    // Keep the displayed radius in sync with the active screen.
+    CornerRadiusPlugin.screenRadiusStream.listen((radius) {
+      if (!mounted) return;
+      setState(() {
+        _screenRadius = radius;
+      });
+    });
   }
 
   @override
@@ -30,85 +49,70 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(title: const Text('Corner Radius Plugin Example')),
         body: SafeArea(
-          child: FutureBuilder(
-            future: _radiusFuture,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              final data = snapshot.data;
-              if (data == null) {
-                return const Center(child: Text('No data'));
-              }
-
-              // Demonstrate the static getter after init.
-              final screenRadius = CornerRadiusPlugin.screenRadius;
-
-              return Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(screenRadius.topLeft),
-                            topRight: Radius.circular(screenRadius.topRight),
-                            bottomLeft: Radius.circular(
-                              screenRadius.bottomLeft,
+          child: !_initialized
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(_screenRadius.topLeft),
+                              topRight: Radius.circular(_screenRadius.topRight),
+                              bottomLeft: Radius.circular(
+                                _screenRadius.bottomLeft,
+                              ),
+                              bottomRight: Radius.circular(
+                                _screenRadius.bottomRight,
+                              ),
                             ),
-                            bottomRight: Radius.circular(
-                              screenRadius.bottomRight,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Stack(
+                              children: [
+                                _CornerValue(
+                                  alignment: Alignment.topLeft,
+                                  value: _screenRadius.topLeft,
+                                ),
+                                _CornerValue(
+                                  alignment: Alignment.topRight,
+                                  value: _screenRadius.topRight,
+                                ),
+                                _CornerValue(
+                                  alignment: Alignment.bottomLeft,
+                                  value: _screenRadius.bottomLeft,
+                                ),
+                                _CornerValue(
+                                  alignment: Alignment.bottomRight,
+                                  value: _screenRadius.bottomRight,
+                                ),
+                              ],
                             ),
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      Card(
                         child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Stack(
-                            children: [
-                              _CornerValue(
-                                alignment: Alignment.topLeft,
-                                value: screenRadius.topLeft,
-                              ),
-                              _CornerValue(
-                                alignment: Alignment.topRight,
-                                value: screenRadius.topRight,
-                              ),
-                              _CornerValue(
-                                alignment: Alignment.bottomLeft,
-                                value: screenRadius.bottomLeft,
-                              ),
-                              _CornerValue(
-                                alignment: Alignment.bottomRight,
-                                value: screenRadius.bottomRight,
-                              ),
-                            ],
+                          padding: const EdgeInsets.all(12),
+                          child: Text(
+                            'Initialized with defaultRadius: 12\n'
+                            'Current values (TL, TR, BL, BR): '
+                            '${_screenRadius.topLeft.toStringAsFixed(2)}, '
+                            '${_screenRadius.topRight.toStringAsFixed(2)}, '
+                            '${_screenRadius.bottomLeft.toStringAsFixed(2)}, '
+                            '${_screenRadius.bottomRight.toStringAsFixed(2)}',
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Text(
-                          'Initialized with defaultRadius: 12\n'
-                          'Current values (TL, TR, BL, BR): '
-                          '${screenRadius.topLeft.toStringAsFixed(2)}, '
-                          '${screenRadius.topRight.toStringAsFixed(2)}, '
-                          '${screenRadius.bottomLeft.toStringAsFixed(2)}, '
-                          '${screenRadius.bottomRight.toStringAsFixed(2)}',
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            },
-          ),
         ),
       ),
     );

@@ -27,6 +27,14 @@ abstract class CornerRadiusPluginPlatform extends PlatformInterface {
     throw UnimplementedError('getScreenRadius() has not been implemented.');
   }
 
+  /// Stream of native screen corner radius maps.
+  ///
+  /// On platforms that cannot emit native updates (or before a listener is
+  /// attached) this stream may be empty.
+  Stream<Map<String, double>?> getScreenRadiusStream() {
+    return const Stream.empty();
+  }
+
   Future<Map<String, String>?> getDeviceInfo() {
     throw UnimplementedError('getDeviceInfo() has not been implemented.');
   }
