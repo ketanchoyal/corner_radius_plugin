@@ -1,3 +1,7 @@
+## 1.0.1 - 2026-10-19
+
+Device dataset Updated
+
 ## 1.0.0 - 2026-10-13
 
 - Support iOS 26+ devices via `UICornerConfiguration`, reading the real per-corner display radius for the active screen.
